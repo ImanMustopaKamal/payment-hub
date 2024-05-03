@@ -1,0 +1,53 @@
+service: payment-hub
+
+frameworkVersion: ^3.22.0
+
+useDotenv: true
+
+provider: 
+  name: aws
+  runtime: go1.x # Change to `provided.al2` while deployment
+  stage: ${opt:stage, 'dev'}
+  timeout: 120 # Change to 30 while deployment
+  memorySize: 256
+  region: ap-southeast-1
+  versionFunctions: false
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:493140499986:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+plugins:
+  - serverless-offline
+
+functions:
+  - ${file(functions/functions.yml):functions}
+
+resources:
+  Resources:
+    TodosDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}

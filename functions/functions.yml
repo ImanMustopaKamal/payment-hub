@@ -1,0 +1,60 @@
+functions:
+  create:
+    name: create
+    handler: functions/contacts/create/main.go
+    events:
+      - http:
+          path: contacts
+          method: post
+          cors: true
+          response:
+            headers:
+              Content-Type: application/json
+
+  getall:
+    name: getall
+    handler: functions/contacts/getall/main.go
+    events:
+      - http: 
+          path: contacts
+          method: get
+          cors: true
+          response:
+            headers:
+              Content-Type: application/json
+
+  getone:
+    name: getone
+    handler: functions/contacts/getone/main.go
+    events:
+      - http:
+          path: contacts/{id}
+          method: get
+          cors: true
+          response:
+            headers:
+              Content-Type: application/json
+
+  update:
+    name: update
+    handler: functions/contacts/update/main.go
+    events:
+      - http:
+          path: contacts/{id}
+          method: put
+          cors: true
+          response:
+            headers:
+              Content-Type: application/json
+
+  delete:
+    name: delete
+    handler: functions/contacts/delete/main.go
+    events:
+      - http:
+          path: contacts/{id}
+          method: delete
+          cors: true
+          response:
+            headers:
+              Content-Type: application/json
